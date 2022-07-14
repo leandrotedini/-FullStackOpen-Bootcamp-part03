@@ -1,0 +1,5 @@
+### get all Persons
+GET http://localhost:3001/api/persons
+
+### get only one person
+GET http://localhost:3001/api/persons/2

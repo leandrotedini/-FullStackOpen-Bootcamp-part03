@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
 
 let persons = [
   { 
@@ -24,6 +25,26 @@ let persons = [
   }
 ]
 
+function generateRandomId() {
+  min = Math.ceil(100);
+  max = Math.floor(999999);
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+function checkNewPerson (newPerson) {
+  let errorMessage = ''
+
+  if (newPerson.name === '' || newPerson.number === ''){
+    errorMessage = 'Wrong name or number'
+  }
+
+  if (persons.some((element) => element.name === newPerson.name)){
+    errorMessage = 'name must be unique'
+  }
+
+  return errorMessage
+}
+
 app.get('/info', (request, response) => {
   response.send(`
     <p>Phonebook has info for ${persons.length} people</p>
@@ -40,10 +61,28 @@ app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
   const person = persons.find(p => p.id === id)
   
-  if (person) {
+  person ? response.json(person) : response.status(404).end()
+
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  persons = persons.filter(p => p.id !== id)
+
+  response.status(204).end()
+})
+
+app.post('/api/persons', (request, response) => {
+
+  const person = request.body
+  const errorMessage = checkNewPerson(person)
+
+  if (errorMessage === ''){
+    person.id = generateRandomId()
+    persons = persons.concat(person)
     response.json(person)
   } else {
-    response.status(404).end()
+    response.json({ error: errorMessage }).status(400).end()
   }
 })
 
