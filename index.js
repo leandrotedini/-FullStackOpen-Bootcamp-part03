@@ -1,6 +1,11 @@
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
 app.use(express.json())
+
+morgan.token('person', (req, res) => JSON.stringify(req.body))
+app.use(morgan(':method :url - :response-time ms :person'))
 
 let persons = [
   { 
@@ -80,7 +85,7 @@ app.post('/api/persons', (request, response) => {
   if (errorMessage === ''){
     person.id = generateRandomId()
     persons = persons.concat(person)
-    response.json(person)
+    response.json(person).status(201).end()
   } else {
     response.json({ error: errorMessage }).status(400).end()
   }
