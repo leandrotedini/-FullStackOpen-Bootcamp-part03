@@ -1,1 +1,1 @@
-AppLink: https://lit-eyrie-96557.herokuapp.com/api/persons/
+AppLink: https://lit-eyrie-96557.herokuapp.com/
