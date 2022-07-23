@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 app.use(express.static('build'))
 
-morgan.token('person', (req, res) => JSON.stringify(req.body))
+morgan.token('person', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url - :response-time ms :person'))
 
 app.use(cors())
@@ -41,9 +41,9 @@ app.get('/api/persons/:id', (request, response, next) => {
     })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -93,8 +93,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     response.status(400).send({ error: 'malformatted id' })
-  }  else if (error.name === 'ValidationError') {
-      return response.status(400).json({ error: error.message })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)
